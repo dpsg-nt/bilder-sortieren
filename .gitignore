@@ -1,0 +1,7 @@
+.idea/
+*.iml
+.config.php
+*.secret
+
+node_modules/
+build/
