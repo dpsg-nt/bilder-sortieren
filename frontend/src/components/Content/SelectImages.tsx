@@ -1,9 +1,10 @@
 import useAxios from 'axios-hooks';
-import { Image, ImagesResponse } from '../data/api';
+import { Image, ImagesResponse } from '../../data/api';
 import React, { useState } from 'react';
 import { SelectableImage } from './SelectableImage';
-import { PictureStatus } from '../data/state';
-import { Dialog, DialogContent } from '@mui/material';
+import { PictureStatus } from '../../data/state';
+import { Dialog, DialogContent, Grid } from '@mui/material';
+import { LoadingScreen } from '../Helper/LoadingScreen';
 
 export const SelectImages: React.FC<{
   year: string;
@@ -22,11 +23,11 @@ export const SelectImages: React.FC<{
   };
 
   return response.loading || !response.data ? (
-    <div>loading...</div>
+    <LoadingScreen text="Bilder werden geladen..." />
   ) : (
     <>
       <Dialog open={highlightedImage !== undefined} onClose={() => setHighlightedImage(undefined)} maxWidth="lg">
-        <DialogContent>
+        <DialogContent onClick={() => setHighlightedImage(undefined)}>
           <img
             src={highlightedImage?.full}
             alt={highlightedImage?.name}
@@ -34,7 +35,7 @@ export const SelectImages: React.FC<{
           />
         </DialogContent>
       </Dialog>
-      <div>
+      <Grid item textAlign="center">
         {response.data
           .sort((a, b) => (a.captureDate ?? 'z').localeCompare(b.captureDate ?? 'z'))
           .map((image) => (
@@ -46,7 +47,7 @@ export const SelectImages: React.FC<{
               onNewStatus={(newStatus) => props.onChange({ ...props.pictureStatus, [image.name]: newStatus })}
             />
           ))}
-      </div>
+      </Grid>
     </>
   );
 };

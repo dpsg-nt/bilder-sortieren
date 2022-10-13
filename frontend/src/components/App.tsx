@@ -1,50 +1,31 @@
-import React, { useEffect, useState } from 'react';
-import { State } from '../data/state';
-import { SelectYear } from './SelectYear';
-import { SelectEvent } from './SelectEvent';
-import { SelectImages } from './SelectImages';
-import { Login } from './Login';
-import axios from 'axios';
+import * as React from 'react';
+
+import { PageContainer } from './Page/PageContainer';
+import { PageHeader } from './Page/PageHeader';
+import { RoutingAndState } from './RoutingAndState';
+import { makeStyles } from 'tss-react/mui';
+
+const useStyles = makeStyles()((theme) => ({
+  app: {
+    backgroundColor: theme.palette.primary.main,
+    minHeight: '100vh',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    padding: '20px 10px',
+    fontSize: '12px',
+    color: '#fff',
+  },
+}));
 
 export const App: React.FC = () => {
-  const [password, setPassword] = useState<string>(sessionStorage.getItem('password') ?? '');
-
-  useEffect(() => {
-    sessionStorage.setItem('password', password);
-    axios.defaults.auth = { username: 'admin', password };
-  }, [password]);
-
-  const [state, setState] = useState<State>(() =>
-    window.location.hash
-      ? JSON.parse(atob(window.location.hash.substring(1)))
-      : { year: undefined, event: undefined, selectedPictures: [] }
-  );
-
-  const updateState = React.useCallback(
-    (newState: State) => {
-      setState(newState);
-      const url = new URL(window.location.href);
-      url.hash = btoa(JSON.stringify(newState));
-      window.location.replace(url.href);
-    },
-    [setState]
-  );
-
-  if (!password) {
-    return <Login setPassword={setPassword} />;
-  }
-  if (state.year === undefined) {
-    return <SelectYear onSelect={(year) => updateState({ year, event: undefined, pictureStatus: {} })} />;
-  }
-  if (state.event === undefined) {
-    return <SelectEvent year={state.year} onSelect={(event) => updateState({ ...state, event })} />;
-  }
+  const { classes } = useStyles();
   return (
-    <SelectImages
-      year={state.year}
-      event={state.event}
-      pictureStatus={state.pictureStatus}
-      onChange={(pictures) => updateState({ ...state, pictureStatus: pictures })}
-    />
+    <div className={classes.app}>
+      <PageContainer>
+        <PageHeader title="Bilder Sortieren" />
+        <RoutingAndState />
+      </PageContainer>
+    </div>
   );
 };
