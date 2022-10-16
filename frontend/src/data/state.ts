@@ -13,14 +13,18 @@ export type PictureStatus = 'approved' | 'rejected' | 'undecided';
 
 export const useAppState = () => {
   const [password, setPassword] = useState<string>(sessionStorage.getItem('password') ?? '');
+  const [axiosConfigured, setAxiosConfigured] = useState(false);
 
   useEffect(() => {
     axios.defaults.baseURL = window.location.hostname === 'localhost' ? 'http://localhost:3002' : './';
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem('password', password);
-    axios.defaults.headers.common = { 'X-PW-Auth': password };
+    if (password) {
+      sessionStorage.setItem('password', password);
+      axios.defaults.headers.common = { 'X-PW-Auth': password };
+      setAxiosConfigured(true);
+    }
   }, [password]);
 
   const [state, setState] = useState<State>(() =>
@@ -39,5 +43,5 @@ export const useAppState = () => {
     [setState]
   );
 
-  return { passwordConfigured: !!password, setPassword, state, updateState };
+  return { passwordConfigured: !!password && axiosConfigured, setPassword, state, updateState };
 };
