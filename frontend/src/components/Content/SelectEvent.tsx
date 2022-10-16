@@ -6,7 +6,7 @@ import { Button, Grid, Typography } from '@mui/material';
 
 export const SelectEvent: React.FC<{ year: string; onSelect: (event: string) => void }> = (props) => {
   const [response] = useAxios<EventsResponse>({
-    url: `http://localhost:3002/events?year=${encodeURIComponent(props.year)}`,
+    url: `events?year=${encodeURIComponent(props.year)}`,
   });
 
   return response.loading ? (

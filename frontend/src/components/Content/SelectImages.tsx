@@ -30,7 +30,7 @@ export const SelectImages: React.FC<{
   const [filter, setFilter] = useState<Filter>('all');
 
   const [response] = useAxios<ImagesResponse>({
-    url: `http://localhost:3002/images?year=${encodeURIComponent(props.year)}&event=${encodeURIComponent(props.event)}`,
+    url: `images?year=${encodeURIComponent(props.year)}&event=${encodeURIComponent(props.event)}`,
   });
 
   const filteredAndSortedImages: Image[] = response.data

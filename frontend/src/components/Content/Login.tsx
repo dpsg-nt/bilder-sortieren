@@ -9,7 +9,7 @@ export const Login: React.FC<{ setPassword: (password: string) => void }> = (pro
 
   const checkAndSetPassword = async () => {
     setLoginPending(true);
-    const result = await axios.get('http://localhost:3002/years', {
+    const result = await axios.get('years', {
       auth: { username: 'admin', password: password },
       validateStatus: (status) => true,
     });

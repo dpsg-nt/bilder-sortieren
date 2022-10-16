@@ -15,6 +15,10 @@ export const useAppState = () => {
   const [password, setPassword] = useState<string>(sessionStorage.getItem('password') ?? '');
 
   useEffect(() => {
+    axios.defaults.baseURL = window.location.hostname === 'localhost' ? 'http://localhost:3002' : './';
+  }, []);
+
+  useEffect(() => {
     sessionStorage.setItem('password', password);
     axios.defaults.auth = { username: 'admin', password };
   }, [password]);
