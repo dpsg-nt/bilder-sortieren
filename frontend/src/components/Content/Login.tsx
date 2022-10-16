@@ -5,8 +5,10 @@ import { Button, Grid, TextField, Typography } from '@mui/material';
 export const Login: React.FC<{ setPassword: (password: string) => void }> = (props) => {
   const [password, setPassword] = useState<string>('');
   const [invalidPassword, setInvalidPassword] = useState(false);
+  const [loginPending, setLoginPending] = useState(false);
 
   const checkAndSetPassword = async () => {
+    setLoginPending(true);
     const result = await axios.get('http://localhost:3002/years', {
       auth: { username: 'admin', password: password },
       validateStatus: (status) => true,
@@ -16,6 +18,7 @@ export const Login: React.FC<{ setPassword: (password: string) => void }> = (pro
     } else {
       props.setPassword(password);
     }
+    setLoginPending(false);
   };
 
   return (
@@ -27,16 +30,18 @@ export const Login: React.FC<{ setPassword: (password: string) => void }> = (pro
         <TextField
           label="Passwort"
           fullWidth
+          autoFocus
           onChange={(e) => {
             setPassword(e.target.value);
             setInvalidPassword(false);
           }}
+          onKeyPress={(e) => e.code === 'Enter' && checkAndSetPassword()}
           helperText={invalidPassword && 'Ungültiges Passwort!'}
           error={invalidPassword}
         />
       </Grid>
       <Grid item>
-        <Button variant="contained" onClick={checkAndSetPassword}>
+        <Button variant="contained" onClick={checkAndSetPassword} disabled={loginPending}>
           Login
         </Button>
       </Grid>

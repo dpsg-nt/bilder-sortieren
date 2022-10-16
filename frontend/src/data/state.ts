@@ -9,7 +9,7 @@ export interface State {
   };
 }
 
-export type PictureStatus = 'approved' | 'rejected';
+export type PictureStatus = 'approved' | 'rejected' | 'undecided';
 
 export const useAppState = () => {
   const [password, setPassword] = useState<string>(sessionStorage.getItem('password') ?? '');

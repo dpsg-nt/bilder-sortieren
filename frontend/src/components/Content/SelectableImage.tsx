@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { Image } from '../../data/api';
 import { PictureStatus } from '../../data/state';
 import { makeStyles } from 'tss-react/mui';
-import { Typography } from '@mui/material';
+import ZoomInIcon from '@mui/icons-material/ZoomIn';
+import NotInterestedIcon from '@mui/icons-material/NotInterested';
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 
 const useStyles = makeStyles()((theme) => ({
   image: {
@@ -40,7 +42,7 @@ const useStyles = makeStyles()((theme) => ({
     display: 'flex',
     flexFlow: 'column',
     justifyContent: 'stretch',
-    backgroundColor: '#fff',
+    backgroundColor: 'rgba(255,255,255,0.7)',
     fontWeight: 'bold',
   },
   optionRow: { display: 'flex', flexGrow: 1, justifyContent: 'stretch' },
@@ -49,18 +51,18 @@ const useStyles = makeStyles()((theme) => ({
 
 export const SelectableImage: React.FC<{
   image: Image;
-  status?: PictureStatus;
+  status: PictureStatus;
   onClick: () => void;
   onNewStatus: (status: PictureStatus) => void;
 }> = (props) => {
-  const { classes } = useStyles();
+  const { classes, theme } = useStyles();
   const [hovered, setHovered] = useState(false);
   return (
     <div
       onMouseOver={() => setHovered(true)}
       onMouseOut={() => setHovered(false)}
       className={`${classes.image} ${
-        props.status === undefined
+        props.status === 'undecided'
           ? classes.imageNotReviewed
           : props.status === 'approved'
           ? classes.imageApproved
@@ -68,18 +70,22 @@ export const SelectableImage: React.FC<{
       }`}
       style={{ backgroundImage: `url(${props.image.thumbnail})` }}
     >
-      <div className={classes.optionField} style={{ opacity: hovered ? 0.7 : 0.0 }}>
+      <div className={classes.optionField} style={{ opacity: hovered ? 1.0 : 0.0 }}>
         <div className={classes.optionRow}>
           <div className={classes.optionItem} onClick={props.onClick}>
-            <Typography>Bild vergrößern</Typography>
+            <ZoomInIcon color="primary" fontSize="large" />
           </div>
         </div>
         <div className={classes.optionRow}>
           <div className={classes.optionItem} onClick={() => props.onNewStatus('approved')}>
-            <Typography>Auswählen</Typography>
+            <CheckCircleOutlineIcon
+              sx={{ color: props.status === 'approved' ? theme.palette.success.main : theme.palette.primary.main }}
+            />
           </div>
           <div className={classes.optionItem} onClick={() => props.onNewStatus('rejected')}>
-            <Typography>Ablehnen</Typography>
+            <NotInterestedIcon
+              sx={{ color: props.status === 'rejected' ? theme.palette.error.main : theme.palette.primary.main }}
+            />
           </div>
         </div>
       </div>
