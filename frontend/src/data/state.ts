@@ -20,7 +20,7 @@ export const useAppState = () => {
 
   useEffect(() => {
     sessionStorage.setItem('password', password);
-    axios.defaults.auth = { username: 'admin', password };
+    axios.defaults.headers.common = { 'X-PW-Auth': password };
   }, [password]);
 
   const [state, setState] = useState<State>(() =>

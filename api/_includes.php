@@ -7,10 +7,9 @@ header("Access-Control-Allow-Headers: *");
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS') exit();
 
-if ($_SERVER['PHP_AUTH_PW'] != USER_PASSWORD) {
-    header("WWW-Authenticate: Basic realm=\"protected\"");
+if ($_SERVER['HTTP_X_PW_AUTH'] != USER_PASSWORD) {
     header("HTTP/1.0 401 Unauthorized");
-    exit('invalid password');
+    exit('invalid authorization');
 }
 
 function get_access_token() {

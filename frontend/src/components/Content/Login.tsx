@@ -10,7 +10,7 @@ export const Login: React.FC<{ setPassword: (password: string) => void }> = (pro
   const checkAndSetPassword = async () => {
     setLoginPending(true);
     const result = await axios.get('years', {
-      auth: { username: 'admin', password: password },
+      headers: { 'X-PW-Auth': password },
       validateStatus: (status) => true,
     });
     if (result.status !== 200) {
