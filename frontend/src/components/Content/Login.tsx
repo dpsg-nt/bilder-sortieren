@@ -35,7 +35,8 @@ export const Login: React.FC<{ setPassword: (password: string) => void }> = (pro
             setPassword(e.target.value);
             setInvalidPassword(false);
           }}
-          onKeyPress={(e) => e.code === 'Enter' && checkAndSetPassword()}
+          type="password"
+          onKeyDown={(e) => e.code === 'Enter' && checkAndSetPassword()}
           helperText={invalidPassword && 'Ungültiges Passwort!'}
           error={invalidPassword}
         />

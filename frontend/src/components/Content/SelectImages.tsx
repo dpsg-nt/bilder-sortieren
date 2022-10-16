@@ -72,12 +72,15 @@ export const SelectImages: React.FC<{
         onClose={() => setShareSelectionOpen(false)}
       />
       <Grid item>
+        <Typography variant="h5">Auswahl für "{props.event}"</Typography>
+      </Grid>
+      <Grid item>
         <Typography>
           Entscheide jetzt für jedes Bild ob es zur Auswahl hinzugefügt werden soll ("Auswählen"), oder ob es nicht
           hinzugefügt werden soll ("Ablehnen").
         </Typography>
       </Grid>
-      <Grid item container spacing={2}>
+      <Grid item container justifyContent="space-between">
         <Grid item>
           <FormControl sx={{ width: '250px' }} size="small">
             <InputLabel id="image-filter">Bilder filtern</InputLabel>
