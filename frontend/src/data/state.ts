@@ -4,12 +4,7 @@ import axios from 'axios';
 export interface State {
   year: string | undefined;
   event: string | undefined;
-  pictureStatus: {
-    [key: string]: PictureStatus;
-  };
 }
-
-export type PictureStatus = 'approved' | 'rejected' | 'undecided';
 
 export const useAppState = () => {
   const [password, setPassword] = useState<string>(sessionStorage.getItem('password') ?? '');

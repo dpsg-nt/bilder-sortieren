@@ -11,3 +11,8 @@ export interface Image {
   full: string;
 }
 export type ImagesResponse = Image[];
+
+export type AuswahlResponse = {
+  approved: string[];
+  rejected: string[];
+};

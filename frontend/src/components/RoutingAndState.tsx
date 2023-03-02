@@ -19,7 +19,7 @@ export const RoutingAndState: React.FC = () => {
   if (state.year === undefined) {
     return (
       <SmallPageSection>
-        <SelectYear onSelect={(year) => updateState({ year, event: undefined, pictureStatus: {} })} />
+        <SelectYear onSelect={(year) => updateState({ year, event: undefined })} />
       </SmallPageSection>
     );
   }
@@ -32,12 +32,7 @@ export const RoutingAndState: React.FC = () => {
   }
   return (
     <WidePageSection>
-      <SelectImages
-        year={state.year}
-        event={state.event}
-        pictureStatus={state.pictureStatus}
-        onChange={(pictures) => updateState({ ...state, pictureStatus: pictures })}
-      />
+      <SelectImages year={state.year} event={state.event} />
     </WidePageSection>
   );
 };

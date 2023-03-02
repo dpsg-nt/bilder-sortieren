@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Image } from '../../data/api';
-import { PictureStatus } from '../../data/state';
+import { PictureStatus } from './SelectImages';
 import { makeStyles } from 'tss-react/mui';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import NotInterestedIcon from '@mui/icons-material/NotInterested';

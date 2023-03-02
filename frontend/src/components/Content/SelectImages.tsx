@@ -1,8 +1,7 @@
 import useAxios from 'axios-hooks';
-import { Image, ImagesResponse } from '../../data/api';
+import { Image, ImagesResponse, AuswahlResponse } from '../../data/api';
 import React, { useState } from 'react';
 import { SelectableImage } from './SelectableImage';
-import { PictureStatus } from '../../data/state';
 import {
   Button,
   Dialog,
@@ -15,40 +14,82 @@ import {
   Typography,
 } from '@mui/material';
 import { LoadingScreen } from '../Helper/LoadingScreen';
-import { ShareSelection } from './ShareSelection';
+import axios from 'axios';
 
 type Filter = 'all' | 'approved' | 'rejected' | 'undecided';
+export type PictureStatus = 'approved' | 'rejected' | 'undecided';
 
 export const SelectImages: React.FC<{
   year: string;
   event: string;
-  pictureStatus: { [key: string]: PictureStatus };
-  onChange: (selectedImages: { [key: string]: PictureStatus }) => void;
 }> = (props) => {
-  const [shareSelectionOpen, setShareSelectionOpen] = useState(false);
+  const [localAuswahl, setLocalAuswahl] = useState<AuswahlResponse>({ approved: [], rejected: [] });
   const [highlightedImage, setHighlightedImage] = useState<Image>();
   const [filter, setFilter] = useState<Filter>('all');
+  const [auswahlImported, setAuswahlImported] = useState(false);
+  const [changesSinceLastSave, setChangesSinceLastSave] = useState(false);
 
-  const [response] = useAxios<ImagesResponse>({
-    url: `images?year=${encodeURIComponent(props.year)}&event=${encodeURIComponent(props.event)}`,
-  });
+  const params = `year=${encodeURIComponent(props.year)}&event=${encodeURIComponent(props.event)}`;
+
+  const [response] = useAxios<ImagesResponse>({ url: `images?${params}` });
+  const [auswahlResponse] = useAxios<AuswahlResponse>({ url: `auswahl?${params}` });
 
   const filteredAndSortedImages: Image[] = response.data
     ? response.data
-        .filter((image) => filter === 'all' || filter === (props.pictureStatus[image.id] ?? 'undecided'))
+        .filter(
+          (image) =>
+            filter === 'all' ||
+            (filter === 'approved' && localAuswahl.approved.includes(image.name)) ||
+            (filter === 'rejected' && localAuswahl.rejected.includes(image.name)) ||
+            (filter === 'undecided' &&
+              !localAuswahl.approved.includes(image.name) &&
+              !localAuswahl.rejected.includes(image.name))
+        )
         .sort((a, b) => (a.captureDate ?? 'z').localeCompare(b.captureDate ?? 'z'))
     : [];
+
+  const serverAuswahl: AuswahlResponse = React.useMemo(() => {
+    if (auswahlResponse?.data) {
+      const auswahl = { approved: [...auswahlResponse?.data.approved], rejected: [...auswahlResponse?.data.rejected] };
+      auswahl.approved.sort();
+      auswahl.rejected.sort();
+      return auswahl;
+    } else {
+      return { approved: [], rejected: [] };
+    }
+  }, [auswahlResponse]);
 
   const showImage = (image: Image) => {
     setHighlightedImage(image);
   };
 
   const onNewStatus = (image: Image, newStatus: PictureStatus) => {
-    if (props.pictureStatus[image.id] === newStatus) {
-      props.onChange({ ...props.pictureStatus, [image.id]: 'undecided' });
-    } else {
-      props.onChange({ ...props.pictureStatus, [image.id]: newStatus });
+    const newAuswahl: AuswahlResponse = {
+      approved: localAuswahl.approved.filter((name) => image.name !== name),
+      rejected: localAuswahl.rejected.filter((name) => image.name !== name),
+    };
+    switch (newStatus) {
+      case 'approved':
+        newAuswahl.approved.push(image.name);
+        break;
+      case 'rejected':
+        newAuswahl.rejected.push(image.name);
+        break;
+      case 'undecided':
+        break;
     }
+    setLocalAuswahl(newAuswahl);
+    setChangesSinceLastSave(true);
+  };
+
+  const loadSharedAuswahl = () => {
+    setLocalAuswahl({ approved: [...serverAuswahl.approved], rejected: [...serverAuswahl.rejected] });
+    setAuswahlImported(true);
+  };
+
+  const saveAuswahl = async () => {
+    await axios.post(`auswahl?${params}`, localAuswahl);
+    setChangesSinceLastSave(false);
   };
 
   return response.loading || !response.data ? (
@@ -64,13 +105,6 @@ export const SelectImages: React.FC<{
           />
         </DialogContent>
       </Dialog>
-      <ShareSelection
-        event={props.event}
-        images={response.data ?? []}
-        pictureStatus={props.pictureStatus}
-        open={shareSelectionOpen}
-        onClose={() => setShareSelectionOpen(false)}
-      />
       <Grid item>
         <Typography variant="h5">Auswahl für "{props.event}"</Typography>
       </Grid>
@@ -98,9 +132,22 @@ export const SelectImages: React.FC<{
           </FormControl>
         </Grid>
         <Grid item>
-          <Button variant="contained" onClick={() => setShareSelectionOpen(true)}>
-            Aktuelle Auswahl teilen
-          </Button>
+          {(serverAuswahl.approved.length > 0 || serverAuswahl.rejected.length > 0) && !auswahlImported && (
+            <>
+              &nbsp;
+              <Button variant="contained" onClick={() => loadSharedAuswahl()}>
+                Bestehende Auswahl laden
+              </Button>
+            </>
+          )}
+          {changesSinceLastSave && (
+            <>
+              &nbsp;
+              <Button variant="contained" onClick={() => saveAuswahl()}>
+                Auswahl speichern
+              </Button>
+            </>
+          )}
         </Grid>
       </Grid>
       <Grid item>
@@ -108,7 +155,13 @@ export const SelectImages: React.FC<{
           <SelectableImage
             key={image.id}
             image={image}
-            status={props.pictureStatus[image.id] ?? 'undecided'}
+            status={
+              localAuswahl.approved.includes(image.name)
+                ? 'approved'
+                : localAuswahl.rejected.includes(image.name)
+                ? 'rejected'
+                : 'undecided'
+            }
             onClick={() => showImage(image)}
             onNewStatus={(newStatus) => onNewStatus(image, newStatus)}
           />
