@@ -23,9 +23,7 @@ export const useAppState = () => {
   }, [password]);
 
   const [state, setState] = useState<State>(() =>
-    window.location.hash
-      ? JSON.parse(atob(window.location.hash.substring(1)))
-      : { year: undefined, event: undefined, selectedPictures: [] }
+    window.location.hash ? JSON.parse(atob(window.location.hash.substring(1))) : { year: undefined, event: undefined }
   );
 
   const updateState = React.useCallback(
@@ -33,7 +31,7 @@ export const useAppState = () => {
       setState(newState);
       const url = new URL(window.location.href);
       url.hash = btoa(JSON.stringify(newState));
-      window.location.replace(url.href);
+      window.location.assign(url.href);
     },
     [setState]
   );
