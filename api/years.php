@@ -17,4 +17,4 @@ curl_close($curl);
 $folders = array_filter(json_decode($response)->value, fn($value) => str_starts_with($value->name, 'Jahr ') && !str_contains($value->name, '-'));
 $result = array_map(fn($value) => $value->name, $folders);
 
-echo json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+echo json_encode(array_values($result), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
